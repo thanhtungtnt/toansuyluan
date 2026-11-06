@@ -116,13 +116,19 @@
             animation: shakeError 0.4s ease-in-out;
         }
 
-        /* Bounce Jump for Frog on Number Line */
-        @keyframes frogHop {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-18px) scale(1.15); }
+        /* Magical Hover & Jump for Princess Elsa on Number Line */
+        @keyframes elsaFloat {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+                filter: drop-shadow(0 2px 5px rgba(56, 189, 248, 0.4));
+            }
+            50% {
+                transform: translateY(-16px) scale(1.08);
+                filter: drop-shadow(0 6px 12px rgba(56, 189, 248, 0.8));
+            }
         }
-        .frog-hop {
-            animation: frogHop 0.8s infinite ease-in-out;
+        .elsa-hop {
+            animation: elsaFloat 1s infinite ease-in-out;
         }
 
         /* Custom Scrollbar for Number Line */
@@ -307,16 +313,27 @@
                                 Giải mã mật thư: <span id="step1-phrase-title" class="text-purple-700 underline decoration-wavy">""</span> là số mấy?
                             </h3>
                         </div>
-                        <button onclick="toggleStep1Hint()" class="self-start sm:self-auto bg-amber-100 hover:bg-amber-200 text-amber-900 border-2 border-amber-300 font-bold px-3 py-1.5 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition">
-                            <span>💡</span> Mẹo suy luận
+                        <button onclick="toggleStep1Hint()" class="self-start sm:self-auto bg-sky-100 hover:bg-sky-200 text-sky-900 border-2 border-sky-300 font-bold px-3 py-1.5 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition shadow-sm">
+                            <span>❄️</span> Elsa mách nước
                         </button>
                     </div>
 
-                    <!-- Detective Tip Box -->
-                    <div id="step1-hint-box" class="bg-white rounded-2xl p-3.5 border-2 border-purple-200 flex items-start gap-3 shadow-sm">
-                        <div class="text-2xl sm:text-3xl shrink-0">🐸</div>
-                        <div class="text-sm sm:text-base text-slate-700 font-bold leading-snug" id="step1-hint-text">
-                            <!-- Populated by JS -->
+                    <!-- Princess Elsa Detective Tip Box -->
+                    <div id="step1-hint-box" class="bg-gradient-to-r from-sky-50 via-cyan-50 to-indigo-50 rounded-2xl p-3.5 border-2 border-sky-300 flex items-start gap-3 shadow-sm">
+                        <div class="flex flex-col items-center shrink-0">
+                            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-sky-400 via-cyan-200 to-indigo-400 p-0.5 shadow-md flex items-center justify-center relative">
+                                <span class="text-2xl filter drop-shadow">👸🏼</span>
+                                <span class="absolute -bottom-1 -right-1 text-xs">❄️</span>
+                            </div>
+                            <span class="text-[10px] font-extrabold text-sky-800 bg-white px-2 py-0.5 rounded-full border border-sky-300 mt-1 shadow-xs">Elsa</span>
+                        </div>
+                        <div class="space-y-1 flex-1">
+                            <div class="text-xs font-extrabold uppercase text-sky-800 tracking-wider flex items-center gap-1.5">
+                                <span>❄️</span> Công chúa Elsa mách nước cho bé:
+                            </div>
+                            <div class="text-sm sm:text-base text-slate-700 font-bold leading-snug" id="step1-hint-text">
+                                <!-- Populated by JS -->
+                            </div>
                         </div>
                     </div>
 
@@ -1291,7 +1308,7 @@
             }
 
             const wrapper = document.createElement('div');
-            wrapper.className = "flex items-end justify-start sm:justify-center gap-2 sm:gap-3 min-w-max px-2 pt-7 pb-2 relative";
+            wrapper.className = "flex items-end justify-start sm:justify-center gap-2 sm:gap-3 min-w-max px-2 pt-9 pb-2 relative";
 
             numbers.forEach((num, idx) => {
                 const isAnchor = (num === anchor && anchor !== target);
@@ -1308,12 +1325,12 @@
                 const nodeWrap = document.createElement('div');
                 nodeWrap.className = "flex flex-col items-center relative";
 
-                // Top Marker for Anchor Number
+                // Top Marker for Anchor Number (Princess Elsa)
                 if (isAnchor) {
                     const marker = document.createElement('div');
-                    marker.className = "absolute -top-7 whitespace-nowrap bg-slate-800 text-white text-[11px] font-extrabold px-2 py-0.5 rounded-full shadow flex items-center gap-1 frog-hop";
+                    marker.className = "absolute -top-8 whitespace-nowrap bg-gradient-to-r from-sky-600 via-indigo-600 to-blue-700 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full shadow-lg border border-sky-300 flex items-center gap-1.5 elsa-hop ring-2 ring-sky-300/60 z-10";
                     const dirArrow = (target < anchor) ? '⬅️ Lùi' : 'Tiến ➡️';
-                    marker.innerHTML = `<span>🐸 Số gốc</span> <span class="text-amber-300">${dirArrow}</span>`;
+                    marker.innerHTML = `<span>👸🏼 Elsa: Số gốc</span> <span class="bg-black/25 text-amber-300 px-1.5 py-0.2 rounded-md font-black">${dirArrow}</span>`;
                     nodeWrap.appendChild(marker);
                 }
 
