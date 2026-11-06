@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Thám Tử Toán Học - Giải Mã Mật Thư</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Baloo 2 & Nunito for playful Vietnamese typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['"Baloo 2"', 'cursive', 'sans-serif'],
+                        body: ['"Nunito"', 'sans-serif'],
+                    },
+                    colors: {
+                        detective: {
+                            bg: '#FFFBEB',
+                            card: '#FFFFFF',
+                            primary: '#F59E0B',
+                            secondary: '#3B82F6',
+                            accent: '#8B5CF6',
+                            success: '#10B981',
+                            danger: '#EF4444'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #FEF3C7;
+            background-image: radial-gradient(#FDE68A 2px, transparent 2px), radial-gradient(#FDE68A 2px, #FEF3C7 2px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        h1, h2, h3, .font-title {
+            font-family: 'Baloo 2', cursive;
+        }
+
+        /* 3D Button Effects */
+        .btn-3d {
+            transition: all 0.15s ease;
+            position: relative;
+            top: 0;
+        }
+        .btn-3d:active {
+            top: 4px;
+            box-shadow: 0 0px 0 0 transparent !important;
+        }
+
+        .btn-amber {
+            background: linear-gradient(180deg, #FBBF24 0%, #F59E0B 100%);
+            box-shadow: 0 6px 0 0 #B45309;
+        }
+        .btn-blue {
+            background: linear-gradient(180deg, #60A5FA 0%, #2563EB 100%);
+            box-shadow: 0 6px 0 0 #1E40AF;
+        }
+        .btn-purple {
+            background: linear-gradient(180deg, #A78BFA 0%, #7C3AED 100%);
+            box-shadow: 0 6px 0 0 #4C1D95;
+        }
+        .btn-green {
+            background: linear-gradient(180deg, #34D399 0%, #059669 100%);
+            box-shadow: 0 6px 0 0 #065F46;
+        }
+        .btn-rose {
+            background: linear-gradient(180deg, #FB7185 0%, #E11D48 100%);
+            box-shadow: 0 6px 0 0 #9F1239;
+        }
+        .btn-white {
+            background: #FFFFFF;
+            box-shadow: 0 5px 0 0 #CBD5E1;
+            border: 2px solid #E2E8F0;
+        }
+
+        /* Glowing Mystery Phrase Badge */
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.5); transform: scale(1); }
+            50% { box-shadow: 0 0 0 8px rgba(139, 92, 246, 0); transform: scale(1.02); }
+        }
+        .mystery-badge {
+            animation: pulseGlow 2s infinite;
+        }
+
+        /* Flip Animation when phrase transforms into a number */
+        @keyframes flipReveal {
+            0% { transform: perspective(400px) rotateX(90deg) scale(0.8); opacity: 0; }
+            60% { transform: perspective(400px) rotateX(-15deg) scale(1.1); opacity: 1; }
+            100% { transform: perspective(400px) rotateX(0deg) scale(1); opacity: 1; }
+        }
+        .decoded-badge {
+            animation: flipReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* Shake Animation for wrong answer */
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .shake {
+            animation: shakeError 0.4s ease-in-out;
+        }
+
+        /* Bounce Jump for Frog on Number Line */
+        @keyframes frogHop {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-18px) scale(1.15); }
+        }
+        .frog-hop {
+            animation: frogHop 0.8s infinite ease-in-out;
+        }
+
+        /* Custom Scrollbar for Number Line */
+        .no-scrollbar::-webkit-scrollbar {
+            height: 6px;
+        }
+        .no-scrollbar::-webkit-scrollbar-track {
+            background: #F1F5F9;
+            border-radius: 10px;
+        }
+        .no-scrollbar::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 10px;
+        }
+
+        /* Confetti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 pb-12">
+
+    <!-- Confetti Overlay -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- HEADER BAR -->
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b-4 border-amber-300 shadow-sm">
+        <div class="max-w-5xl mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-2.5">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-2xl shadow-md border-2 border-white">
+                    🕵️‍♂️
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-extrabold text-amber-900 leading-none tracking-tight">
+                        THÁM TỬ TOÁN HỌC
+                    </h1>
+                    <p class="text-xs sm:text-sm font-bold text-amber-600">
+                        Cỗ Máy Giải Mã Mật Thư Lớp 2
+                    </p>
+                </div>
+            </div>
+
+            <!-- Stats & Rank Badge -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Detective Rank -->
+                <div class="hidden sm:flex items-center gap-2 bg-indigo-50 border-2 border-indigo-200 px-3 py-1.5 rounded-2xl">
+                    <span id="rank-icon" class="text-xl">🔍</span>
+                    <div class="text-left">
+                        <div class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-400 leading-none">Cấp bậc</div>
+                        <div id="rank-title" class="text-xs font-extrabold text-indigo-800">Thám Tử Tập Sự</div>
+                    </div>
+                </div>
+
+                <!-- Stars Counter -->
+                <div class="flex items-center gap-1.5 bg-amber-100 border-2 border-amber-300 px-3 py-1.5 rounded-2xl shadow-inner">
+                    <span class="text-xl animate-bounce">⭐</span>
+                    <span id="star-count" class="font-title font-extrabold text-lg sm:text-xl text-amber-800">0</span>
+                </div>
+
+                <!-- Sound Toggle -->
+                <button id="sound-toggle-btn" onclick="toggleSound()" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 flex items-center justify-center text-slate-700 text-lg transition" title="Bật/Tắt âm thanh">
+                    <i id="sound-icon" class="fa-solid fa-volume-high text-emerald-600"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- MODE NAVIGATION TABS -->
+        <div class="max-w-5xl mx-auto px-3 sm:px-6 pt-1 pb-2.5 flex gap-2 overflow-x-auto no-scrollbar">
+            <button onclick="switchMode('story')" id="tab-story" class="flex-1 min-w-[140px] py-2 px-3 rounded-2xl font-title font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all bg-amber-500 text-white shadow-md border-2 border-amber-600">
+                <span>🕵️</span> 1. Phá Án Từng Bước
+            </button>
+            <button onclick="switchMode('drill')" id="tab-drill" class="flex-1 min-w-[140px] py-2 px-3 rounded-2xl font-title font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all bg-white text-slate-600 hover:bg-amber-50 border-2 border-slate-200">
+                <span>⚡</span> 2. Phản Xạ Giải Mã
+            </button>
+            <button onclick="switchMode('dictionary')" id="tab-dictionary" class="flex-1 min-w-[140px] py-2 px-3 rounded-2xl font-title font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all bg-white text-slate-600 hover:bg-amber-50 border-2 border-slate-200">
+                <span>📖</span> 3. Sổ Tay Mật Mã
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-5xl mx-auto px-3 sm:px-6 pt-5">
+
+        <!-- ==========================================
+             MODE 1: PHÁ ÁN TỪNG BƯỚC (GUIDED STORY)
+             ========================================== -->
+        <section id="mode-story" class="space-y-5">
+            
+            <!-- Top Case Selector & Random Generator -->
+            <div class="bg-white rounded-3xl p-3 sm:p-4 border-4 border-amber-200 shadow-md flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-title font-bold text-amber-900 text-base sm:text-lg mr-1">
+                        📁 Chọn Vụ Án:
+                    </span>
+                    <div id="case-pills" class="flex flex-wrap gap-1.5">
+                        <!-- Dynamically populated 1..10 pills -->
+                    </div>
+                </div>
+
+                <button onclick="generateRandomCase()" class="btn-3d btn-purple text-white font-title font-bold px-4 py-2 rounded-2xl text-sm sm:text-base flex items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo Đề Mới Bất Kỳ
+                </button>
+            </div>
+
+            <!-- THE MYSTERY CASE CARD -->
+            <div class="bg-white rounded-3xl p-4 sm:p-6 border-4 border-amber-400 shadow-xl relative overflow-hidden">
+                <!-- Top Case Ribbon -->
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b-2 border-dashed border-amber-200">
+                    <div class="flex items-center gap-2">
+                        <span id="case-badge" class="bg-amber-500 text-white font-title font-extrabold px-3.5 py-1 rounded-full text-sm sm:text-base shadow-sm">
+                            Vụ Án #1
+                        </span>
+                        <span id="case-tag" class="bg-purple-100 text-purple-800 font-bold px-3 py-1 rounded-full text-xs sm:text-sm border border-purple-300">
+                            Mật mã: Số liền trước
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="speakCurrentProblem()" class="btn-3d btn-blue text-white font-bold px-3.5 py-1.5 rounded-xl text-xs sm:text-sm flex items-center gap-1.5">
+                            <i class="fa-solid fa-volume-high"></i> Đọc Đề Bài
+                        </button>
+                        <button onclick="resetCurrentCase()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-3 py-1.5 rounded-xl text-xs sm:text-sm flex items-center gap-1 transition" title="Làm lại bài này">
+                            <i class="fa-solid fa-rotate-right"></i> Làm lại
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Story Text Display -->
+                <div class="bg-amber-50/80 rounded-2xl p-4 sm:p-6 border-2 border-amber-200 mb-5">
+                    <div id="story-text-container" class="text-lg sm:text-2xl font-bold leading-relaxed sm:leading-loose text-slate-800">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div id="story-decoded-notice" class="hidden mt-3 pt-2 border-t border-emerald-200 text-xs sm:text-sm font-bold text-emerald-700 flex items-center gap-1.5">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Tuyệt vời! Cụm từ lắt léo đã biến hình thành con số đơn giản rồi kìa!</span>
+                    </div>
+                </div>
+
+                <!-- 3-STEP PROGRESS BAR -->
+                <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
+                    <div id="step-indicator-1" class="rounded-2xl p-2.5 sm:p-3 border-2 flex items-center gap-2.5 transition-all">
+                        <div class="w-8 h-8 rounded-full font-title font-extrabold flex items-center justify-center text-sm shrink-0" id="step-circle-1">1</div>
+                        <div class="leading-tight">
+                            <div class="text-[11px] uppercase font-extrabold opacity-75">Bước 1</div>
+                            <div class="text-xs sm:text-sm font-extrabold">Giải mã cụm từ</div>
+                        </div>
+                    </div>
+                    <div id="step-indicator-2" class="rounded-2xl p-2.5 sm:p-3 border-2 flex items-center gap-2.5 transition-all">
+                        <div class="w-8 h-8 rounded-full font-title font-extrabold flex items-center justify-center text-sm shrink-0" id="step-circle-2">2</div>
+                        <div class="leading-tight">
+                            <div class="text-[11px] uppercase font-extrabold opacity-75">Bước 2</div>
+                            <div class="text-xs sm:text-sm font-extrabold">Chọn phép tính</div>
+                        </div>
+                    </div>
+                    <div id="step-indicator-3" class="rounded-2xl p-2.5 sm:p-3 border-2 flex items-center gap-2.5 transition-all">
+                        <div class="w-8 h-8 rounded-full font-title font-extrabold flex items-center justify-center text-sm shrink-0" id="step-circle-3">3</div>
+                        <div class="leading-tight">
+                            <div class="text-[11px] uppercase font-extrabold opacity-75">Bước 3</div>
+                            <div class="text-xs sm:text-sm font-extrabold">Tính kết quả</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==========================================
+                     STEP 1 WORKSPACE: DECODE HIDDEN PHRASE
+                     ========================================== -->
+                <div id="workspace-step-1" class="bg-purple-50 rounded-3xl p-4 sm:p-6 border-3 border-purple-200 space-y-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <span class="inline-block bg-purple-600 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-1">
+                                🔍 Nhiệm vụ Bước 1
+                            </span>
+                            <h3 class="text-lg sm:text-xl font-title font-extrabold text-purple-950">
+                                Giải mã mật thư: <span id="step1-phrase-title" class="text-purple-700 underline decoration-wavy">""</span> là số mấy?
+                            </h3>
+                        </div>
+                        <button onclick="toggleStep1Hint()" class="self-start sm:self-auto bg-amber-100 hover:bg-amber-200 text-amber-900 border-2 border-amber-300 font-bold px-3 py-1.5 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition">
+                            <span>💡</span> Mẹo suy luận
+                        </button>
+                    </div>
+
+                    <!-- Detective Tip Box -->
+                    <div id="step1-hint-box" class="bg-white rounded-2xl p-3.5 border-2 border-purple-200 flex items-start gap-3 shadow-sm">
+                        <div class="text-2xl sm:text-3xl shrink-0">🐸</div>
+                        <div class="text-sm sm:text-base text-slate-700 font-bold leading-snug" id="step1-hint-text">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- INTERACTIVE VISUAL NUMBER LINE (TIA SỐ THÔNG MINH) -->
+                    <div class="bg-white rounded-2xl p-3 sm:p-4 border-2 border-purple-200 shadow-inner">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs sm:text-sm font-extrabold text-purple-800 flex items-center gap-1.5">
+                                <i class="fa-solid fa-ruler-horizontal"></i> TIA SỐ THÁM TỬ (Con có thể bấm trực tiếp vào số trên tia số!):
+                            </span>
+                            <span id="numberline-legend" class="text-xs font-bold text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-lg border border-amber-300">
+                                ⭐ Màu vàng = Số tròn chục
+                            </span>
+                        </div>
+                        
+                        <div id="number-line-container" class="overflow-x-auto no-scrollbar py-4 px-2">
+                            <!-- Populated dynamically with SVG/HTML Interactive Number Line -->
+                        </div>
+                    </div>
+
+                    <!-- Multiple Choice Options for Step 1 -->
+                    <div>
+                        <div class="text-xs sm:text-sm font-extrabold text-purple-900 mb-2.5 text-center">
+                            👇 Chọn con số mật mã đúng:
+                        </div>
+                        <div id="step1-options" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <!-- 4 Big Choice Buttons -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==========================================
+                     STEP 2 WORKSPACE: CHOOSE OPERATION (+ OR -)
+                     ========================================== -->
+                <div id="workspace-step-2" class="hidden bg-blue-50 rounded-3xl p-4 sm:p-6 border-3 border-blue-200 space-y-5">
+                    <div>
+                        <span class="inline-block bg-blue-600 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-1">
+                            ⚖️ Nhiệm vụ Bước 2
+                        </span>
+                        <h3 class="text-lg sm:text-xl font-title font-extrabold text-blue-950">
+                            Đọc đề bài mới đã rút gọn và chọn phép tính đúng!
+                        </h3>
+                    </div>
+
+                    <!-- Visual Bar Model (Sơ đồ đoạn thẳng) -->
+                    <div class="bg-white rounded-2xl p-4 border-2 border-blue-200 shadow-sm space-y-3">
+                        <div class="text-xs sm:text-sm font-extrabold text-blue-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-chart-bar"></i> SƠ ĐỒ TÓM TẮT DỄ HIỂU:
+                        </div>
+                        <div id="bar-model-container" class="space-y-2.5 py-1">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div id="step2-clue-box" class="bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-xs sm:text-sm font-bold text-amber-900">
+                            <!-- Clue explanation -->
+                        </div>
+                    </div>
+
+                    <!-- Operation Choice Buttons -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                        <button onclick="checkStep2('+')" class="btn-3d btn-green text-white rounded-2xl p-4 flex items-center justify-center gap-4 group">
+                            <div class="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-4xl font-title font-extrabold">
+                                +
+                            </div>
+                            <div class="text-left">
+                                <div class="font-title font-extrabold text-xl sm:text-2xl">PHÉP CỘNG (+)</div>
+                                <div class="text-xs sm:text-sm font-bold text-emerald-100">Thêm vào • Nhiều hơn • Gộp lại</div>
+                            </div>
+                        </button>
+
+                        <button onclick="checkStep2('-')" class="btn-3d btn-rose text-white rounded-2xl p-4 flex items-center justify-center gap-4 group">
+                            <div class="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-4xl font-title font-extrabold">
+                                −
+                            </div>
+                            <div class="text-left">
+                                <div class="font-title font-extrabold text-xl sm:text-2xl">PHÉP TRỪ (−)</div>
+                                <div class="text-xs sm:text-sm font-bold text-rose-100">Ít hơn • Bớt đi • Tìm phần còn lại</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ==========================================
+                     STEP 3 WORKSPACE: CALCULATE FINAL ANSWER
+                     ========================================== -->
+                <div id="workspace-step-3" class="hidden bg-emerald-50 rounded-3xl p-4 sm:p-6 border-3 border-emerald-200 space-y-5">
+                    <div class="text-center">
+                        <span class="inline-block bg-emerald-600 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-1">
+                            🎯 Nhiệm vụ Bước 3 (Cuối cùng!)
+                        </span>
+                        <h3 class="text-lg sm:text-xl font-title font-extrabold text-emerald-950">
+                            Thực hiện phép tính để tìm đáp án cuối cùng nhé!
+                        </h3>
+                    </div>
+
+                    <!-- Big Equation Box -->
+                    <div class="bg-white rounded-3xl p-4 sm:p-6 border-2 border-emerald-300 shadow-inner flex flex-wrap items-center justify-center gap-2 sm:gap-4 font-title text-2xl sm:text-4xl font-extrabold">
+                        <div id="eq-num1" class="bg-slate-100 text-slate-800 px-4 py-2 rounded-2xl border-2 border-slate-300">11</div>
+                        <div id="eq-op" class="text-emerald-600 px-2">+</div>
+                        <div id="eq-num2" class="bg-emerald-100 text-emerald-800 px-4 py-2 rounded-2xl border-2 border-emerald-400">6</div>
+                        <div class="text-slate-400">=</div>
+                        <div id="eq-answer-box" class="min-w-[90px] sm:min-w-[110px] h-14 sm:h-16 bg-amber-50 text-amber-900 px-4 py-2 rounded-2xl border-4 border-amber-400 flex items-center justify-center shadow-inner">
+                            ?
+                        </div>
+                        <div id="eq-unit" class="text-base sm:text-xl font-body font-bold text-slate-500">nhãn vở</div>
+                    </div>
+
+                    <!-- Kid-Friendly On-Screen Numpad -->
+                    <div class="max-w-xs mx-auto">
+                        <div class="grid grid-cols-3 gap-2.5">
+                            <button onclick="pressNumpad('1')" class="btn-3d btn-white h-12 sm:h-14 rounded-2xl font-title font-extrabold text-xl sm:text-2xl text-slate-800 hover:bg-amber-50">1</button>
+                            <button onclick="pressNumpad('2')" class="btn-3d btn-white h-12 sm:h-14 rounded-2xl font-title font-extrabold text-xl sm:text-2xl text-slate-800 hover:bg-amber-50">2</button>
+                            <button onclick="pressNumpad('3')" class="btn-3d btn-white h-12 sm:h-14 rounded-2xl font-title font-extrabold text-xl sm:text-2xl text-slate-800 hover:bg-amber-50">3</button>
+                            <button onclick="pressNumpad('4')" class="btn-3d btn-white h-12 sm:h-14 rounded-2xl font-title font-extrabold text-xl sm:text-2xl text-slate-800 hover:bg-amber-50">4</button>
+                            <button onclick="pressNumpad('5')" class="btn-3d btn-white h-12 sm:h-14 rounded-2xl font-title font-extrabold text-xl sm:text-2xl text-slate-800 hover:bg-amber-50">5</button>
+                            <button onclick="pressNumpad('6')" class="btn-3d btn-white h-12 sm:h-14 rounded-2xl font-title font-extrabold text-xl sm:text-2xl text-slate-800 hover:bg-amber-50">6</button>
+                            <button onclick="pressNumpad('7')" class="btn-3d btn-white h-12 sm:h-14 rounded-2xl font-title font-extrabold text-xl sm:text-2xl text-slate-800 hover:bg-amber-50">7</button>
+                            <button onclick="pressNumpad('8')" class="btn-3d btn-white h-12 sm:h-14 rounded-2xl font-title font-extrabold text-xl sm:text-2xl text-slate-800 hover:bg-amber-50">8</button>
+                            <button onclick="pressNumpad('9')" class="btn-3d btn-white h-12 sm:h-14 rounded-2xl font-title font-extrabold text-xl sm:text-2xl text-slate-800 hover:bg-amber-50">9</button>
+                            <button onclick="pressNumpad('clear')" class="btn-3d bg-rose-100 border-2 border-rose-300 h-12 sm:h-14 rounded-2xl font-title font-extrabold text-sm sm:text-base text-rose-700 flex items-center justify-center gap-1" style="box-shadow: 0 5px 0 0 #FDA4AF;">
+                                <i class="fa-solid fa-delete-left"></i> Xóa
+                            </button>
+                            <button onclick="pressNumpad('0')" class="btn-3d btn-white h-12 sm:h-14 rounded-2xl font-title font-extrabold text-xl sm:text-2xl text-slate-800 hover:bg-amber-50">0</button>
+                            <button onclick="submitStep3()" class="btn-3d btn-green h-12 sm:h-14 rounded-2xl font-title font-extrabold text-base sm:text-lg text-white flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-check"></i> Chốt!
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==========================================
+                     VICTORY SUMMARY PANEL (WHEN CASE SOLVED)
+                     ========================================== -->
+                <div id="workspace-victory" class="hidden bg-gradient-to-br from-amber-100 via-yellow-50 to-emerald-100 rounded-3xl p-5 sm:p-7 border-4 border-amber-400 text-center space-y-4">
+                    <div class="text-5xl sm:text-6xl animate-bounce">🏆</div>
+                    <h3 class="text-2xl sm:text-3xl font-title font-extrabold text-amber-900">
+                        PHÁ ÁN THÀNH CÔNG! (+3 ⭐)
+                    </h3>
+                    <p class="text-sm sm:text-base font-bold text-slate-700 max-w-xl mx-auto">
+                        Con đã tự mình giải mã được cụm từ lắt léo và tìm ra đáp án chính xác. Cùng xem lại bài giải mẫu chuẩn chỉnh nhé:
+                    </p>
+
+                    <!-- Clean Notebook Solution Card (Bài giải mẫu) -->
+                    <div class="bg-white rounded-2xl p-4 sm:p-5 border-2 border-amber-300 max-w-lg mx-auto text-left shadow-md space-y-1.5 font-bold text-slate-800 text-sm sm:text-base">
+                        <div class="text-xs font-extrabold uppercase tracking-wider text-amber-600 mb-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-book-open"></i> Trình bày bài giải vào vở:
+                        </div>
+                        <div id="solution-line-1" class="text-purple-800"></div>
+                        <div id="solution-line-2" class="text-slate-700"></div>
+                        <div id="solution-line-3" class="text-emerald-700 font-extrabold text-base sm:text-lg pl-4"></div>
+                        <div id="solution-line-4" class="text-right text-amber-900 font-extrabold pt-1 border-t border-dashed border-slate-200"></div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+                        <button onclick="nextCase()" class="btn-3d btn-amber text-white font-title font-extrabold px-6 py-3 rounded-2xl text-base sm:text-lg flex items-center gap-2">
+                            Vụ Án Tiếp Theo <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <button onclick="generateRandomCase()" class="btn-3d btn-purple text-white font-title font-extrabold px-5 py-3 rounded-2xl text-base sm:text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-dice"></i> Đề Ngẫu Nhiên Mới
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Feedback Toast Banner Inside Card -->
+                <div id="feedback-banner" class="hidden mt-4 rounded-2xl p-3.5 font-bold text-sm sm:text-base flex items-center justify-center gap-2 text-center transition-all">
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ==========================================
+             MODE 2: PHẢN XẠ GIẢI MÃ (SPEED DRILL GAME)
+             ========================================== -->
+        <section id="mode-drill" class="hidden space-y-5">
+            <div class="bg-white rounded-3xl p-5 sm:p-7 border-4 border-purple-400 shadow-xl">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-3 border-b-2 border-dashed border-purple-200">
+                    <div>
+                        <span class="bg-purple-600 text-white text-xs font-extrabold px-3 py-1 rounded-full uppercase">
+                            ⚡ Luyện Phản Xạ Siêu Tốc
+                        </span>
+                        <h2 class="text-xl sm:text-2xl font-title font-extrabold text-purple-950 mt-1">
+                            Đọc Nhanh - Bắt Trúng Số Bí Ẩn!
+                        </h2>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <div class="bg-orange-100 border-2 border-orange-300 px-3.5 py-1.5 rounded-2xl flex items-center gap-1.5">
+                            <span class="text-lg">🔥</span>
+                            <span class="text-xs font-extrabold text-orange-800 uppercase">Chuỗi đúng:</span>
+                            <span id="drill-streak" class="font-title font-extrabold text-lg text-orange-900">0</span>
+                        </div>
+                        <button onclick="speakDrillQuestion()" class="btn-3d btn-blue text-white font-bold px-3.5 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1.5">
+                            <i class="fa-solid fa-volume-high"></i> Đọc
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Drill Prompt Display -->
+                <div class="bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 rounded-3xl p-5 sm:p-8 border-2 border-purple-200 text-center space-y-3 mb-5">
+                    <div class="text-xs sm:text-sm font-extrabold text-purple-600 uppercase tracking-wider">
+                        Hãy tìm con số tương ứng với mật mã:
+                    </div>
+                    <div id="drill-question-text" class="text-2xl sm:text-4xl font-title font-extrabold text-purple-950 leading-snug">
+                        "Số tròn chục liền trước của 37"
+                    </div>
+                    <div id="drill-rule-hint" class="inline-block bg-white/90 text-slate-700 font-bold text-xs sm:text-sm px-4 py-1.5 rounded-full border border-purple-200 shadow-sm">
+                        💡 Nhìn về bên trái số 37, tìm số có đuôi bằng 0 gần nhất!
+                    </div>
+                </div>
+
+                <!-- Mini Visual Number Line inside Drill Mode -->
+                <div class="bg-slate-50 rounded-2xl p-3 border-2 border-slate-200 mb-5">
+                    <div id="drill-numberline" class="overflow-x-auto no-scrollbar py-2"></div>
+                </div>
+
+                <!-- 4 Answer Buttons -->
+                <div id="drill-options" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div id="drill-feedback" class="hidden mt-4 rounded-2xl p-3 font-bold text-center text-sm sm:text-base"></div>
+            </div>
+        </section>
+
+
+        <!-- ==========================================
+             MODE 3: SỔ TAY MẬT MÃ (VISUAL CHEAT SHEET)
+             ========================================== -->
+        <section id="mode-dictionary" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl p-5 sm:p-7 border-4 border-amber-400 shadow-xl space-y-6">
+                <div class="text-center max-w-2xl mx-auto space-y-1">
+                    <span class="bg-amber-500 text-white text-xs font-extrabold px-3 py-1 rounded-full uppercase">
+                        📖 Bí Kíp Thám Tử Nhí
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-title font-extrabold text-amber-950">
+                        Sổ Tay Giải Mã Các Cụm Từ Lắt Léo
+                    </h2>
+                    <p class="text-sm sm:text-base font-bold text-slate-600">
+                        Khi gặp những từ khóa này trong bài toán, con chỉ cần nhớ quy tắc nhảy trên tia số dưới đây là không bao giờ bị nhầm nữa!
+                    </p>
+                </div>
+
+                <!-- Cards Grid for Hidden Number Phrases -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <!-- Card 1: Số liền trước -->
+                    <div class="bg-sky-50 rounded-3xl p-4 sm:p-5 border-2 border-sky-300 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="bg-sky-600 text-white font-title font-bold px-3 py-1 rounded-xl text-base">
+                                1. Số liền trước
+                            </span>
+                            <span class="font-title font-extrabold text-sky-800 text-lg bg-white px-3 py-0.5 rounded-xl border border-sky-200">
+                                Lùi 1 bước (− 1)
+                            </span>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700">
+                            Là số đứng ngay sát bên <b>TRÁI</b> trên tia số. Muốn tìm số liền trước, ta lấy số đó <b>trừ đi 1</b>.
+                        </p>
+                        <div class="bg-white rounded-2xl p-3 border border-sky-200 flex items-center justify-center gap-3 font-title font-extrabold text-lg">
+                            <span class="bg-emerald-500 text-white px-3.5 py-1.5 rounded-xl shadow">6</span>
+                            <span class="text-sky-600 text-sm font-body font-extrabold">⬅️ Lùi 1 (−1)</span>
+                            <span class="bg-slate-800 text-white px-3.5 py-1.5 rounded-xl">7</span>
+                            <span class="text-xs font-body text-slate-500">(Số liền trước của 7 là 6)</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Số liền sau -->
+                    <div class="bg-emerald-50 rounded-3xl p-4 sm:p-5 border-2 border-emerald-300 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="bg-emerald-600 text-white font-title font-bold px-3 py-1 rounded-xl text-base">
+                                2. Số liền sau
+                            </span>
+                            <span class="font-title font-extrabold text-emerald-800 text-lg bg-white px-3 py-0.5 rounded-xl border border-emerald-200">
+                                Tiến 1 bước (+ 1)
+                            </span>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700">
+                            Là số đứng ngay sát bên <b>PHẢI</b> trên tia số. Muốn tìm số liền sau, ta lấy số đó <b>cộng thêm 1</b>.
+                        </p>
+                        <div class="bg-white rounded-2xl p-3 border border-emerald-200 flex items-center justify-center gap-3 font-title font-extrabold text-lg">
+                            <span class="bg-slate-800 text-white px-3.5 py-1.5 rounded-xl">19</span>
+                            <span class="text-emerald-600 text-sm font-body font-extrabold">Tiến 1 (+1) ➡️</span>
+                            <span class="bg-emerald-500 text-white px-3.5 py-1.5 rounded-xl shadow">20</span>
+                            <span class="text-xs font-body text-slate-500">(Số liền sau của 19 là 20)</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Số tròn chục liền trước -->
+                    <div class="bg-amber-50 rounded-3xl p-4 sm:p-5 border-2 border-amber-300 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="bg-amber-600 text-white font-title font-bold px-3 py-1 rounded-xl text-base">
+                                3. Số tròn chục liền trước
+                            </span>
+                            <span class="font-title font-extrabold text-amber-900 text-sm bg-white px-3 py-1 rounded-xl border border-amber-200">
+                                Đuôi số 0 bên TRÁI
+                            </span>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700">
+                            <b>Số tròn chục</b> là các số có tận cùng là <b>0</b> (10, 20, 30, 40, 50, 60, 70, 80, 90). <br>
+                            <b>Số tròn chục liền trước</b>: Nhìn về bên <b>TRÁI</b> số đã cho, tìm số tròn chục gần nhất! (Mẹo: Nếu số không tròn chục, chỉ cần đổi chữ số hàng đơn vị thành số 0!).
+                        </p>
+                        <div class="bg-white rounded-2xl p-3 border border-amber-200 flex flex-wrap items-center justify-center gap-2 font-title font-extrabold text-base">
+                            <span class="bg-amber-400 text-amber-950 px-3 py-1 rounded-xl border-2 border-amber-600">30 ⭐</span>
+                            <span class="text-slate-300">...</span>
+                            <span class="text-amber-700 text-xs font-body font-extrabold">⬅️ Nhảy lùi về đuôi 0</span>
+                            <span class="bg-slate-800 text-white px-3 py-1 rounded-xl">37</span>
+                            <span class="text-slate-300">...</span>
+                            <span class="bg-slate-100 text-slate-400 px-2.5 py-1 rounded-xl">40</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Số tròn chục liền sau -->
+                    <div class="bg-purple-50 rounded-3xl p-4 sm:p-5 border-2 border-purple-300 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="bg-purple-600 text-white font-title font-bold px-3 py-1 rounded-xl text-base">
+                                4. Số tròn chục liền sau
+                            </span>
+                            <span class="font-title font-extrabold text-purple-900 text-sm bg-white px-3 py-1 rounded-xl border border-purple-200">
+                                Đuôi số 0 bên PHẢI
+                            </span>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700">
+                            Nhìn về bên <b>PHẢI</b> (lớn hơn) số đã cho trên tia số, tìm anh bạn có tận cùng là <b>0</b> gần nhất!
+                        </p>
+                        <div class="bg-white rounded-2xl p-3 border border-purple-200 flex flex-wrap items-center justify-center gap-2 font-title font-extrabold text-base">
+                            <span class="bg-slate-100 text-slate-400 px-2.5 py-1 rounded-xl">40</span>
+                            <span class="text-slate-300">...</span>
+                            <span class="bg-slate-800 text-white px-3 py-1 rounded-xl">48</span>
+                            <span class="text-purple-700 text-xs font-body font-extrabold">Nhảy tiến tới đuôi 0 ➡️</span>
+                            <span class="bg-purple-600 text-white px-3 py-1 rounded-xl border-2 border-purple-800">50 ⭐</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Special Numbers Table -->
+                <div class="bg-indigo-50 rounded-3xl p-4 sm:p-5 border-2 border-indigo-200 space-y-3">
+                    <h3 class="font-title font-extrabold text-lg sm:text-xl text-indigo-950 flex items-center gap-2">
+                        <span>🌟</span> Các "Mật Mã Đặc Biệt" Hay Gặp Trong Đề Thi:
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-sm font-bold">
+                        <div class="bg-white p-3 rounded-2xl border border-indigo-200 flex items-center justify-between">
+                            <span>Số lớn nhất có 1 chữ số</span>
+                            <span class="bg-indigo-600 text-white font-title font-extrabold px-3 py-0.5 rounded-xl text-lg">9</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-2xl border border-indigo-200 flex items-center justify-between">
+                            <span>Số nhỏ nhất có 2 chữ số</span>
+                            <span class="bg-indigo-600 text-white font-title font-extrabold px-3 py-0.5 rounded-xl text-lg">10</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-2xl border border-indigo-200 flex items-center justify-between">
+                            <span>Số nhỏ nhất có 2 chữ số giống nhau</span>
+                            <span class="bg-indigo-600 text-white font-title font-extrabold px-3 py-0.5 rounded-xl text-lg">11</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-2xl border border-indigo-200 flex items-center justify-between">
+                            <span>Số lớn nhất có 2 chữ số</span>
+                            <span class="bg-indigo-600 text-white font-title font-extrabold px-3 py-0.5 rounded-xl text-lg">99</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-2xl border border-indigo-200 flex items-center justify-between">
+                            <span>Số tròn chục lớn nhất có 2 chữ số</span>
+                            <span class="bg-indigo-600 text-white font-title font-extrabold px-3 py-0.5 rounded-xl text-lg">90</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-2xl border border-indigo-200 flex items-center justify-between">
+                            <span>Số tròn chục nhỏ nhất có 2 chữ số</span>
+                            <span class="bg-indigo-600 text-white font-title font-extrabold px-3 py-0.5 rounded-xl text-lg">10</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operation Clue Table -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-emerald-50 rounded-2xl p-4 border-2 border-emerald-200">
+                        <div class="font-title font-extrabold text-emerald-900 text-lg mb-1">➕ Khi nào chọn PHÉP CỘNG (+)?</div>
+                        <ul class="text-sm font-bold text-slate-700 space-y-1 list-disc list-inside">
+                            <li>Có từ: <b>"cộng thêm"</b>, <b>"thêm vào"</b>, <b>"được cho thêm"</b></li>
+                            <li>Có từ: <b>"nhiều hơn"</b> (khi đi tìm số lớn hơn)</li>
+                            <li>Hỏi: <b>"Cả hai bạn có tất cả bao nhiêu...?"</b></li>
+                        </ul>
+                    </div>
+                    <div class="bg-rose-50 rounded-2xl p-4 border-2 border-rose-200">
+                        <div class="font-title font-extrabold text-rose-900 text-lg mb-1">➖ Khi nào chọn PHÉP TRỪ (−)?</div>
+                        <ul class="text-sm font-bold text-slate-700 space-y-1 list-disc list-inside">
+                            <li>Có từ: <b>"ít hơn"</b>, <b>"kém hơn"</b>, <b>"bớt đi"</b>, <b>"cho đi"</b></li>
+                            <li><b>Biết TỔNG của 2 bạn</b> và biết số lượng của 1 bạn, hỏi bạn còn lại: Lấy <b>Tổng − Bạn đã biết</b>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        /* ==========================================================
+           1. SOUND & VOICE SYNTHESIS (100% Web Audio API + TTS)
+           ========================================================== */
+        let soundEnabled = true;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                if (!audioCtx) return;
+
+                const now = audioCtx.currentTime;
+                if (type === 'click') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(520, now);
+                    osc.frequency.exponentialRampToValueAtTime(680, now + 0.06);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.06);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.06);
+                } else if (type === 'correct') {
+                    const notes = [523.25, 659.25, 783.99, 1046.5];
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+                        gain.gain.setValueAtTime(0.2, now + idx * 0.07);
+                        gain.gain.exponentialRampToValueAtTime(0.008, now + idx * 0.07 + 0.22);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + idx * 0.07);
+                        osc.stop(now + idx * 0.07 + 0.22);
+                    });
+                } else if (type === 'wrong') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.linearRampToValueAtTime(150, now + 0.25);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'fanfare') {
+                    const melody = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5];
+                    const times  = [0, 0.1, 0.2, 0.3, 0.45, 0.58];
+                    const durs   = [0.09, 0.09, 0.09, 0.12, 0.1, 0.35];
+                    melody.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + times[idx]);
+                        gain.gain.setValueAtTime(0.25, now + times[idx]);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + times[idx] + durs[idx]);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + times[idx]);
+                        osc.stop(now + times[idx] + durs[idx]);
+                    });
+                }
+            } catch (e) {
+                // Ignore audio errors
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('sound-icon');
+            if (soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high text-emerald-600';
+                playSound('click');
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-slate-400';
+                if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            }
+        }
+
+        function speakVietnamese(text) {
+            if (!soundEnabled || !('speechSynthesis' in window)) return;
+            try {
+                window.speechSynthesis.cancel();
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.lang = 'vi-VN';
+                utter.rate = 0.92;
+                window.speechSynthesis.speak(utter);
+            } catch (e) {}
+        }
+
+        /* ==========================================================
+           2. PROBLEM BANK (10 CURATED CASES + DYNAMIC GENERATOR)
+           ========================================================== */
+        const curatedProblems = [
+            // Exact Example 1 from user prompt
+            {
+                id: 1,
+                title: "Vụ Án #1 (Ví dụ 1)",
+                tag: "Số liền trước",
+                storyBefore: "Hùng có <b class='text-blue-700'>11</b> nhãn vở, Lan có số nhãn vở bằng số nhãn vở của Hùng <span class='underline decoration-emerald-500 decoration-2'>cộng thêm</span> ",
+                trickyPhrase: "số liền trước của 7",
+                storyAfter: ". Hỏi Lan có bao nhiêu nhãn vở?",
+                phraseType: "lien_truoc",
+                anchorNum: 7,
+                decodedNum: 6,
+                step1Options: [5, 6, 7, 8],
+                step1Hint: "<b>Số liền trước của 7</b> là số đứng ngay bên TRÁI số 7 trên tia số (Ta lấy 7 − 1 = 6).",
+                knownNum: 11,
+                knownLabel: "Hùng có",
+                decodedLabel: "Cộng thêm",
+                targetLabel: "Lan có",
+                operation: "+",
+                opClue: "Đề bài nói số nhãn vở của Lan bằng của Hùng <b>'cộng thêm'</b> 6 nhãn vở, nên ta dùng <b>Phép Cộng (+)</b>.",
+                num1: 11,
+                num2: 6,
+                finalAnswer: 17,
+                unit: "nhãn vở",
+                solutionStatement: "Số nhãn vở Lan có là:"
+            },
+            // Exact Example 2 from user prompt
+            {
+                id: 2,
+                title: "Vụ Án #2 (Ví dụ 2)",
+                tag: "Số tròn chục liền trước",
+                storyBefore: "Minh và Lan có <span class='underline decoration-rose-500 decoration-2'>tổng</span> <b class='text-blue-700'>45</b> quả táo. Biết rằng Lan có số quả táo là ",
+                trickyPhrase: "số tròn chục liền trước của 37",
+                storyAfter: " quả táo. Hỏi Minh có bao nhiêu quả táo?",
+                phraseType: "tron_chuc_truoc",
+                anchorNum: 37,
+                decodedNum: 30,
+                step1Options: [20, 30, 36, 40],
+                step1Hint: "<b>Số tròn chục</b> có đuôi là 0. Nhìn về bên <b>TRÁI</b> số 37 trên tia số, số có đuôi 0 gần nhất chính là <b>30</b>!",
+                knownNum: 45,
+                knownLabel: "Tổng hai bạn",
+                decodedLabel: "Lan có",
+                targetLabel: "Minh có",
+                operation: "-",
+                opClue: "Biết <b>tổng của hai bạn là 45</b> quả, trong đó Lan có 30 quả. Muốn tìm phần còn lại của Minh, ta lấy Tổng <b>trừ đi (−)</b> số táo của Lan!",
+                num1: 45,
+                num2: 30,
+                finalAnswer: 15,
+                unit: "quả táo",
+                solutionStatement: "Số quả táo Minh có là:"
+            },
+            // Exact Example 3 from user prompt
+            {
+                id: 3,
+                title: "Vụ Án #3 (Ví dụ 3)",
+                tag: "Số tròn chục liền sau",
+                storyBefore: "Minh có số táo là ",
+                trickyPhrase: "số tròn chục liền sau của 48",
+                storyAfter: ". Lan có số táo <span class='underline decoration-rose-500 decoration-2'>ít hơn</span> Minh <b class='text-blue-700'>25</b> quả. Hỏi Lan có bao nhiêu quả táo?",
+                phraseType: "tron_chuc_sau",
+                anchorNum: 48,
+                decodedNum: 50,
+                step1Options: [40, 47, 49, 50],
+                step1Hint: "Nhìn về bên <b>PHẢI</b> (tiến lên) từ số 48 trên tia số, số tròn chục (đuôi 0) đầu tiên ta gặp chính là <b>50</b>!",
+                knownNum: 25,
+                knownLabel: "Minh có",
+                decodedLabel: "Lan ít hơn",
+                targetLabel: "Lan có",
+                operation: "-",
+                opClue: "Minh có 50 quả táo, mà Lan có <b>'ít hơn'</b> Minh 25 quả, nên ta thực hiện <b>Phép Trừ (−)</b>.",
+                num1: 50,
+                num2: 25,
+                finalAnswer: 25,
+                unit: "quả táo",
+                solutionStatement: "Số quả táo Lan có là:"
+            },
+            // Case 4: Số liền sau
+            {
+                id: 4,
+                title: "Vụ Án #4",
+                tag: "Số liền sau",
+                storyBefore: "Mai gấp được <b class='text-blue-700'>18</b> ngôi sao. Đào gấp được <span class='underline decoration-emerald-500 decoration-2'>nhiều hơn</span> Mai số ngôi sao là ",
+                trickyPhrase: "số liền sau của 19",
+                storyAfter: ". Hỏi Đào gấp được bao nhiêu ngôi sao?",
+                phraseType: "lien_sau",
+                anchorNum: 19,
+                decodedNum: 20,
+                step1Options: [18, 19, 20, 21],
+                step1Hint: "<b>Số liền sau của 19</b> là số đứng ngay bên PHẢI số 19 trên tia số (19 + 1 = 20).",
+                knownNum: 18,
+                knownLabel: "Mai có",
+                decodedLabel: "Nhiều hơn",
+                targetLabel: "Đào có",
+                operation: "+",
+                opClue: "Đào gấp được <b>'nhiều hơn'</b> Mai 20 ngôi sao, vậy ta lấy số sao của Mai <b>cộng (+)</b> thêm 20.",
+                num1: 18,
+                num2: 20,
+                finalAnswer: 38,
+                unit: "ngôi sao",
+                solutionStatement: "Số ngôi sao Đào gấp được là:"
+            },
+            // Case 5: Số lớn nhất có 1 chữ số
+            {
+                id: 5,
+                title: "Vụ Án #5",
+                tag: "Số đặc biệt",
+                storyBefore: "Trên cành cây có <b class='text-blue-700'>24</b> chú chim, sau đó có thêm ",
+                trickyPhrase: "số lớn nhất có 1 chữ số",
+                storyAfter: " chú chim <span class='underline decoration-emerald-500 decoration-2'>bay tới thêm</span>. Hỏi trên cành cây có tất cả bao nhiêu chú chim?",
+                phraseType: "special_max1",
+                anchorNum: 9,
+                decodedNum: 9,
+                step1Options: [1, 8, 9, 10],
+                step1Hint: "Các số có 1 chữ số là từ 0 đến 9. Số đứng cuối cùng lớn nhất có 1 chữ số là <b>9</b> (vì 10 là có 2 chữ số rồi!).",
+                knownNum: 24,
+                knownLabel: "Ban đầu",
+                decodedLabel: "Bay tới thêm",
+                targetLabel: "Tất cả",
+                operation: "+",
+                opClue: "Có thêm 9 chú chim <b>'bay tới thêm'</b>, hỏi có tất cả bao nhiêu nên ta chọn <b>Phép Cộng (+)</b>.",
+                num1: 24,
+                num2: 9,
+                finalAnswer: 33,
+                unit: "chú chim",
+                solutionStatement: "Trên cành cây có tất cả số chú chim là:"
+            },
+            // Case 6: Số tròn chục liền trước + Nhiều hơn
+            {
+                id: 6,
+                title: "Vụ Án #6",
+                tag: "Số tròn chục liền trước",
+                storyBefore: "Tổ Một trồng được ",
+                trickyPhrase: "số tròn chục liền trước của 54",
+                storyAfter: " cây hoa. Tổ Hai trồng được <span class='underline decoration-emerald-500 decoration-2'>nhiều hơn</span> Tổ Một <b class='text-blue-700'>16</b> cây hoa. Hỏi Tổ Hai trồng được bao nhiêu cây hoa?",
+                phraseType: "tron_chuc_truoc",
+                anchorNum: 54,
+                decodedNum: 50,
+                step1Options: [40, 50, 53, 60],
+                step1Hint: "Nhìn về bên <b>TRÁI</b> số 54 trên tia số, tìm số có đuôi 0 gần nhất chính là <b>50</b>!",
+                knownNum: 16,
+                knownLabel: "Tổ Một",
+                decodedLabel: "Tổ Hai hơn",
+                targetLabel: "Tổ Hai",
+                operation: "+",
+                opClue: "Tổ Hai trồng được <b>'nhiều hơn'</b> Tổ Một 16 cây, nên ta lấy 50 <b>cộng (+)</b> 16.",
+                num1: 50,
+                num2: 16,
+                finalAnswer: 66,
+                unit: "cây hoa",
+                solutionStatement: "Số cây hoa Tổ Hai trồng được là:"
+            },
+            // Case 7: Số nhỏ nhất có 2 chữ số giống nhau
+            {
+                id: 7,
+                title: "Vụ Án #7",
+                tag: "Số có 2 chữ số giống nhau",
+                storyBefore: "Bình có <b class='text-blue-700'>35</b> viên bi. Bình cho em An ",
+                trickyPhrase: "số nhỏ nhất có hai chữ số giống nhau",
+                storyAfter: " viên bi. Hỏi Bình <span class='underline decoration-rose-500 decoration-2'>còn lại</span> bao nhiêu viên bi?",
+                phraseType: "special_same2",
+                anchorNum: 11,
+                decodedNum: 11,
+                step1Options: [10, 11, 22, 99],
+                step1Hint: "Các số có 2 chữ số giống nhau là: 11, 22, 33, ..., 99. Vậy số <b>nhỏ nhất</b> trong nhóm này chính là <b>11</b>!",
+                knownNum: 35,
+                knownLabel: "Bình có",
+                decodedLabel: "Cho em An",
+                targetLabel: "Còn lại",
+                operation: "-",
+                opClue: "Bình <b>'cho em'</b> 11 viên bi và hỏi <b>'còn lại'</b> bao nhiêu, nên ta dùng <b>Phép Trừ (−)</b>.",
+                num1: 35,
+                num2: 11,
+                finalAnswer: 24,
+                unit: "viên bi",
+                solutionStatement: "Số viên bi Bình còn lại là:"
+            },
+            // Case 8: Số tròn chục liền sau + Biết tổng tìm 1 phần
+            {
+                id: 8,
+                title: "Vụ Án #8",
+                tag: "Số tròn chục liền sau",
+                storyBefore: "Hai thùng có <span class='underline decoration-rose-500 decoration-2'>tổng cộng</span> ",
+                trickyPhrase: "số tròn chục liền sau của 62",
+                storyAfter: " lít mật ong. Biết thùng thứ nhất có <b class='text-blue-700'>28</b> lít. Hỏi thùng thứ hai có bao nhiêu lít mật ong?",
+                phraseType: "tron_chuc_sau",
+                anchorNum: 62,
+                decodedNum: 70,
+                step1Options: [60, 63, 70, 80],
+                step1Hint: "Từ số 62 nhìn về bên <b>PHẢI</b> (tiến lên), số có đuôi bằng 0 gần nhất là <b>70</b>!",
+                knownNum: 28,
+                knownLabel: "Tổng 2 thùng",
+                decodedLabel: "Thùng 1",
+                targetLabel: "Thùng 2",
+                operation: "-",
+                opClue: "Biết tổng cả 2 thùng là 70 lít, thùng 1 có 28 lít. Tìm thùng 2 ta lấy Tổng <b>trừ đi (−)</b> thùng 1!",
+                num1: 70,
+                num2: 28,
+                finalAnswer: 42,
+                unit: "lít mật ong",
+                solutionStatement: "Số lít mật ong ở thùng thứ hai là:"
+            },
+            // Case 9: Số tròn chục liền trước của số tròn chục (Cực hay bị bẫy!)
+            {
+                id: 9,
+                title: "Vụ Án #9 (Cẩn thận bẫy!)",
+                tag: "Số tròn chục liền trước",
+                storyBefore: "Lớp 2A có <b class='text-blue-700'>34</b> học sinh. Hôm nay có ",
+                trickyPhrase: "số tròn chục liền trước của 20",
+                storyAfter: " bạn đi thi vẽ tranh. Hỏi trong lớp <span class='underline decoration-rose-500 decoration-2'>còn lại</span> bao nhiêu bạn?",
+                phraseType: "tron_chuc_truoc",
+                anchorNum: 20,
+                decodedNum: 10,
+                step1Options: [10, 19, 20, 30],
+                step1Hint: "Chú ý nhé! 19 là số liền trước, nhưng không phải số tròn chục! Số <b>tròn chục</b> đứng liền trước 20 (bên trái 20) phải là <b>10</b>!",
+                knownNum: 34,
+                knownLabel: "Cả lớp",
+                decodedLabel: "Đi thi vẽ",
+                targetLabel: "Còn lại",
+                operation: "-",
+                opClue: "Có 10 bạn ra ngoài đi thi, hỏi trong lớp <b>'còn lại'</b> bao nhiêu bạn nên ta dùng <b>Phép Trừ (−)</b>.",
+                num1: 34,
+                num2: 10,
+                finalAnswer: 24,
+                unit: "bạn",
+                solutionStatement: "Số bạn còn lại trong lớp là:"
+            },
+            // Case 10: Số tròn chục lớn nhất có 2 chữ số
+            {
+                id: 10,
+                title: "Vụ Án #10",
+                tag: "Số tròn chục lớn nhất",
+                storyBefore: "Bác Tư thu hoạch được ",
+                trickyPhrase: "số tròn chục lớn nhất có hai chữ số",
+                storyAfter: " quả dừa. Bác đã <span class='underline decoration-rose-500 decoration-2'>bán đi</span> <b class='text-blue-700'>35</b> quả dừa. Hỏi bác Tư còn lại bao nhiêu quả dừa?",
+                phraseType: "special_max_ten",
+                anchorNum: 90,
+                decodedNum: 90,
+                step1Options: [80, 90, 99, 100],
+                step1Hint: "99 là số lớn nhất có 2 chữ số nhưng không tròn chục. Số <b>tròn chục</b> (có đuôi 0) lớn nhất có 2 chữ số là <b>90</b>!",
+                knownNum: 35,
+                knownLabel: "Thu hoạch",
+                decodedLabel: "Đã bán đi",
+                targetLabel: "Còn lại",
+                operation: "-",
+                opClue: "Bác Tư có 90 quả dừa, đã <b>'bán đi'</b> 35 quả, hỏi còn lại bao nhiêu nên ta chọn <b>Phép Trừ (−)</b>.",
+                num1: 90,
+                num2: 35,
+                finalAnswer: 55,
+                unit: "quả dừa",
+                solutionStatement: "Số quả dừa bác Tư còn lại là:"
+            }
+        ];
+
+        /* ==========================================================
+           3. STATE MANAGEMENT
+           ========================================================== */
+        let currentMode = 'story';
+        let currentCaseIndex = 0;
+        let currentProblem = curatedProblems[0];
+        let currentStep = 1; // 1 = Decode, 2 = Operation, 3 = Calculate, 4 = Victory
+        let isPhraseDecoded = false;
+        let step3Input = "";
+        let totalStars = 0;
+        let solvedCaseIds = [];
+
+        // Load saved progress from localStorage
+        try {
+            const savedStars = localStorage.getItem('math_detective_stars');
+            const savedSolved = localStorage.getItem('math_detective_solved');
+            if (savedStars) totalStars = parseInt(savedStars, 10) || 0;
+            if (savedSolved) solvedCaseIds = JSON.parse(savedSolved) || [];
+        } catch (e) {}
+
+        function saveProgress() {
+            try {
+                localStorage.setItem('math_detective_stars', String(totalStars));
+                localStorage.setItem('math_detective_solved', JSON.stringify(solvedCaseIds));
+            } catch (e) {}
+            updateHeaderStats();
+        }
+
+        function updateHeaderStats() {
+            document.getElementById('star-count').textContent = totalStars;
+            const rankIcon = document.getElementById('rank-icon');
+            const rankTitle = document.getElementById('rank-title');
+            if (totalStars >= 30) {
+                rankIcon.textContent = '👑';
+                rankTitle.textContent = 'Siêu Thám Tử Đại Tài';
+            } else if (totalStars >= 15) {
+                rankIcon.textContent = '🕵️‍♂️';
+                rankTitle.textContent = 'Thám Tử Trưởng';
+            } else if (totalStars >= 6) {
+                rankIcon.textContent = '🎖️';
+                rankTitle.textContent = 'Thám Tử Nhí Tài Ba';
+            } else {
+                rankIcon.textContent = '🔍';
+                rankTitle.textContent = 'Thám Tử Tập Sự';
+            }
+        }
+
+        /* ==========================================================
+           4. RENDER CASE & 3-STEP WORKFLOW
+           ========================================================== */
+        function renderCasePills() {
+            const container = document.getElementById('case-pills');
+            container.innerHTML = '';
+            curatedProblems.forEach((prob, idx) => {
+                const isSolved = solvedCaseIds.includes(prob.id);
+                const isCurrent = (!currentProblem.isRandom && idx === currentCaseIndex);
+                const btn = document.createElement('button');
+                btn.onclick = () => selectCase(idx);
+                btn.className = `w-8 h-8 sm:w-9 sm:h-9 rounded-xl font-title font-extrabold text-sm flex items-center justify-center transition-all border-2 ${
+                    isCurrent
+                        ? 'bg-amber-500 text-white border-amber-700 scale-110 shadow-md'
+                        : isSolved
+                        ? 'bg-emerald-100 text-emerald-800 border-emerald-400 hover:bg-emerald-200'
+                        : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-amber-100'
+                }`;
+                btn.innerHTML = isSolved ? `${idx + 1}✓` : `${idx + 1}`;
+                container.appendChild(btn);
+            });
+        }
+
+        function selectCase(index) {
+            playSound('click');
+            currentCaseIndex = index;
+            currentProblem = curatedProblems[index];
+            initProblemState();
+        }
+
+        function resetCurrentCase() {
+            playSound('click');
+            initProblemState();
+        }
+
+        function initProblemState() {
+            currentStep = 1;
+            isPhraseDecoded = false;
+            step3Input = "";
+            hideFeedback();
+            renderCasePills();
+
+            // Header badges
+            document.getElementById('case-badge').textContent = currentProblem.title;
+            document.getElementById('case-tag').textContent = `Mật mã: ${currentProblem.tag}`;
+
+            renderStoryText();
+            updateStepIndicators();
+            renderStep1Workspace();
+
+            document.getElementById('workspace-step-1').classList.remove('hidden');
+            document.getElementById('workspace-step-2').classList.add('hidden');
+            document.getElementById('workspace-step-3').classList.add('hidden');
+            document.getElementById('workspace-victory').classList.add('hidden');
+        }
+
+        function renderStoryText() {
+            const container = document.getElementById('story-text-container');
+            const notice = document.getElementById('story-decoded-notice');
+
+            if (!isPhraseDecoded) {
+                notice.classList.add('hidden');
+                container.innerHTML = `
+                    ${currentProblem.storyBefore}
+                    <span class="mystery-badge inline-flex items-center gap-1.5 bg-purple-600 text-white px-3.5 py-1 rounded-2xl border-2 border-purple-300 shadow-md mx-1">
+                        <span>🔒</span>
+                        <span>${currentProblem.trickyPhrase}</span>
+                        <span class="bg-amber-300 text-purple-950 text-xs font-extrabold px-2 py-0.5 rounded-lg">?</span>
+                    </span>
+                    ${currentProblem.storyAfter}
+                `;
+            } else {
+                notice.classList.remove('hidden');
+                container.innerHTML = `
+                    ${currentProblem.storyBefore}
+                    <span class="decoded-badge inline-flex items-center gap-1.5 bg-emerald-500 text-white px-3.5 py-1 rounded-2xl border-2 border-emerald-700 shadow-md mx-1" title="Đã giải mã từ: ${currentProblem.trickyPhrase}">
+                        <span>🔓</span>
+                        <span class="text-2xl sm:text-3xl font-title font-extrabold underline">${currentProblem.decodedNum}</span>
+                        <span class="text-xs bg-white/20 px-2 py-0.5 rounded-lg font-normal line-through opacity-90 hidden sm:inline">${currentProblem.trickyPhrase}</span>
+                    </span>
+                    ${currentProblem.storyAfter}
+                `;
+            }
+        }
+
+        function updateStepIndicators() {
+            for (let s = 1; s <= 3; s++) {
+                const box = document.getElementById(`step-indicator-${s}`);
+                const circle = document.getElementById(`step-circle-${s}`);
+                if (currentStep > s) {
+                    // Completed step
+                    box.className = "rounded-2xl p-2.5 sm:p-3 border-2 flex items-center gap-2.5 bg-emerald-50 border-emerald-400 text-emerald-900";
+                    circle.className = "w-8 h-8 rounded-full font-title font-extrabold flex items-center justify-center text-sm shrink-0 bg-emerald-500 text-white";
+                    circle.innerHTML = '<i class="fa-solid fa-check"></i>';
+                } else if (currentStep === s) {
+                    // Active step
+                    box.className = "rounded-2xl p-2.5 sm:p-3 border-2 flex items-center gap-2.5 bg-amber-100 border-amber-500 text-amber-950 shadow-md scale-[1.02]";
+                    circle.className = "w-8 h-8 rounded-full font-title font-extrabold flex items-center justify-center text-sm shrink-0 bg-amber-500 text-white";
+                    circle.textContent = s;
+                } else {
+                    // Future step
+                    box.className = "rounded-2xl p-2.5 sm:p-3 border-2 flex items-center gap-2.5 bg-slate-100 border-slate-200 text-slate-400";
+                    circle.className = "w-8 h-8 rounded-full font-title font-extrabold flex items-center justify-center text-sm shrink-0 bg-slate-200 text-slate-500";
+                    circle.textContent = s;
+                }
+            }
+        }
+
+        /* ==========================================================
+           5. STEP 1: VISUAL NUMBER LINE & DECODING
+           ========================================================== */
+        function renderStep1Workspace() {
+            document.getElementById('step1-phrase-title').textContent = `"${currentProblem.trickyPhrase}"`;
+            document.getElementById('step1-hint-text').innerHTML = currentProblem.step1Hint;
+
+            renderInteractiveNumberLine(
+                document.getElementById('number-line-container'),
+                currentProblem,
+                (clickedNum) => checkStep1(clickedNum)
+            );
+
+            // Render 4 choice buttons
+            const optionsDiv = document.getElementById('step1-options');
+            optionsDiv.innerHTML = '';
+            currentProblem.step1Options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.onclick = () => checkStep1(opt, btn);
+                btn.className = "btn-3d btn-white py-3.5 px-4 rounded-2xl font-title font-extrabold text-2xl sm:text-3xl text-purple-900 hover:bg-purple-100 hover:border-purple-400 flex items-center justify-center gap-2";
+                btn.innerHTML = `<span>${opt}</span>`;
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        function toggleStep1Hint() {
+            playSound('click');
+            const box = document.getElementById('step1-hint-box');
+            box.classList.toggle('hidden');
+        }
+
+        /**
+         * Renders an interactive visual number line tailored to the tricky phrase type
+         */
+        function renderInteractiveNumberLine(container, problem, onSelectCallback) {
+            container.innerHTML = '';
+            const type = problem.phraseType;
+            const anchor = problem.anchorNum;
+            const target = problem.decodedNum;
+
+            let numbers = [];
+            if (type === 'lien_truoc' || type === 'lien_sau') {
+                const start = Math.max(0, anchor - 4);
+                const end = anchor + 4;
+                for (let n = start; n <= end; n++) numbers.push(n);
+            } else if (type === 'tron_chuc_truoc' || type === 'tron_chuc_sau') {
+                // Show tens and key numbers around anchor
+                const baseTen = Math.floor(anchor / 10) * 10;
+                const lowTen = Math.max(10, baseTen - 10);
+                const highTen = Math.min(100, baseTen + 20);
+                const setNums = new Set([lowTen, baseTen, anchor - 1, anchor, anchor + 1, baseTen + 10, highTen]);
+                numbers = Array.from(setNums)
+                    .filter(n => n >= 0 && n <= 100)
+                    .sort((a, b) => a - b);
+            } else if (type === 'special_max1') {
+                numbers = [6, 7, 8, 9, 10, 11];
+            } else if (type === 'special_same2') {
+                numbers = [9, 10, 11, 22, 33, 44];
+            } else if (type === 'special_max_ten') {
+                numbers = [60, 70, 80, 90, 99, 100];
+            } else {
+                const start = Math.max(0, target - 3);
+                for (let n = start; n <= target + 3; n++) numbers.push(n);
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.className = "flex items-end justify-start sm:justify-center gap-2 sm:gap-3 min-w-max px-2 pt-7 pb-2 relative";
+
+            numbers.forEach((num, idx) => {
+                const isAnchor = (num === anchor && anchor !== target);
+                const isTen = (num > 0 && num % 10 === 0);
+
+                // Insert "..." separator if gap > 1
+                if (idx > 0 && num - numbers[idx - 1] > 1) {
+                    const dots = document.createElement('div');
+                    dots.className = "text-slate-400 font-extrabold pb-3 px-0.5 text-sm sm:text-base";
+                    dots.textContent = "•••";
+                    wrapper.appendChild(dots);
+                }
+
+                const nodeWrap = document.createElement('div');
+                nodeWrap.className = "flex flex-col items-center relative";
+
+                // Top Marker for Anchor Number
+                if (isAnchor) {
+                    const marker = document.createElement('div');
+                    marker.className = "absolute -top-7 whitespace-nowrap bg-slate-800 text-white text-[11px] font-extrabold px-2 py-0.5 rounded-full shadow flex items-center gap-1 frog-hop";
+                    const dirArrow = (target < anchor) ? '⬅️ Lùi' : 'Tiến ➡️';
+                    marker.innerHTML = `<span>🐸 Số gốc</span> <span class="text-amber-300">${dirArrow}</span>`;
+                    nodeWrap.appendChild(marker);
+                }
+
+                const btn = document.createElement('button');
+                if (onSelectCallback) {
+                    btn.onclick = () => onSelectCallback(num, btn);
+                }
+                btn.className = `w-11 h-11 sm:w-13 sm:h-13 rounded-2xl font-title font-extrabold text-base sm:text-xl flex flex-col items-center justify-center transition-all border-2 ${
+                    isAnchor
+                        ? 'bg-slate-800 text-white border-slate-950 ring-4 ring-purple-300 scale-105'
+                        : isTen
+                        ? 'bg-amber-200 text-amber-950 border-amber-500 hover:bg-amber-300 shadow-sm'
+                        : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-purple-100'
+                }`;
+
+                btn.innerHTML = `
+                    <span>${num}</span>
+                    ${isTen ? '<span class="text-[9px] leading-none font-body font-extrabold text-amber-800">Tròn chục</span>' : ''}
+                `;
+
+                nodeWrap.appendChild(btn);
+                wrapper.appendChild(nodeWrap);
+            });
+
+            container.appendChild(wrapper);
+        }
+
+        function checkStep1(selectedNum, btnEl) {
+            if (currentStep !== 1) return;
+
+            if (selectedNum === currentProblem.decodedNum) {
+                playSound('correct');
+                isPhraseDecoded = true;
+                currentStep = 2;
+
+                // Re-render story with flip animation
+                renderStoryText();
+                updateStepIndicators();
+
+                showFeedback('success', `🎉 Chính xác! "${currentProblem.trickyPhrase}" chính là số ${currentProblem.decodedNum}! Nhìn lên đề bài kìa, mật thư đã biến thành số ${currentProblem.decodedNum} rồi!`);
+
+                // Move to Step 2
+                document.getElementById('workspace-step-1').classList.add('hidden');
+                renderStep2Workspace();
+                document.getElementById('workspace-step-2').classList.remove('hidden');
+            } else {
+                playSound('wrong');
+                if (btnEl) {
+                    btnEl.classList.add('shake', 'bg-rose-100', 'border-rose-400');
+                    setTimeout(() => btnEl.classList.remove('shake', 'bg-rose-100', 'border-rose-400'), 500);
+                }
+
+                // Helpful custom explanation why wrong
+                let reason = `Chưa đúng rồi! Hãy nhìn tia số và thử lại nhé.`;
+                if (currentProblem.phraseType === 'tron_chuc_truoc' && selectedNum === currentProblem.anchorNum - 1) {
+                    reason = `⚠️ Cẩn thận mắc bẫy! ${selectedNum} là "số liền trước", nhưng đề bài hỏi "số TRÒN CHỤC liền trước" (phải có tận cùng là chữ số 0) cơ!`;
+                } else if (currentProblem.phraseType === 'tron_chuc_sau' && selectedNum === currentProblem.anchorNum + 1) {
+                    reason = `⚠️ Cẩn thận mắc bẫy! ${selectedNum} là "số liền sau", nhưng đề bài hỏi "số TRÒN CHỤC liền sau" (phải có đuôi là số 0) nhé!`;
+                } else if (selectedNum > currentProblem.anchorNum && (currentProblem.phraseType.includes('truoc'))) {
+                    reason = `💡 "Liền trước" thì con phải nhìn về bên TRÁI (số nhỏ hơn ${currentProblem.anchorNum}) nhé!`;
+                } else if (selectedNum < currentProblem.anchorNum && (currentProblem.phraseType.includes('sau'))) {
+                    reason = `💡 "Liền sau" thì con phải nhìn về bên PHẢI (số lớn hơn ${currentProblem.anchorNum}) nhé!`;
+                }
+                showFeedback('error', reason);
+            }
+        }
+
+        /* ==========================================================
+           6. STEP 2: VISUAL BAR MODEL & CHOOSE OPERATION
+           ========================================================== */
+        function renderStep2Workspace() {
+            const barContainer = document.getElementById('bar-model-container');
+            const clueBox = document.getElementById('step2-clue-box');
+            clueBox.innerHTML = `💡 <b>Gợi ý suy luận:</b> ${currentProblem.opClue}`;
+
+            if (currentProblem.operation === '+') {
+                barContainer.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <div class="w-24 text-xs sm:text-sm font-extrabold text-slate-600 text-right shrink-0">${currentProblem.knownLabel}:</div>
+                        <div class="h-8 bg-blue-500 text-white rounded-xl px-3 flex items-center justify-center font-title font-extrabold text-sm sm:text-base shadow-sm" style="width: 45%;">
+                            ${currentProblem.num1}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-24 text-xs sm:text-sm font-extrabold text-emerald-700 text-right shrink-0">${currentProblem.targetLabel}:</div>
+                        <div class="flex-1 flex items-center gap-1">
+                            <div class="h-8 bg-blue-400/80 text-white rounded-l-xl px-3 flex items-center justify-center font-title font-extrabold text-sm" style="width: 45%;">
+                                ${currentProblem.num1}
+                            </div>
+                            <div class="h-8 bg-purple-500 text-white rounded-r-xl px-3 flex items-center justify-center font-title font-extrabold text-sm border-2 border-dashed border-white" style="width: 35%;">
+                                + ${currentProblem.num2}
+                            </div>
+                            <span class="ml-2 font-title font-extrabold text-emerald-700 text-base sm:text-lg">= ?</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                barContainer.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <div class="w-24 text-xs sm:text-sm font-extrabold text-slate-600 text-right shrink-0">${currentProblem.knownLabel}:</div>
+                        <div class="h-8 bg-blue-600 text-white rounded-xl px-3 flex items-center justify-center font-title font-extrabold text-sm sm:text-base shadow-sm" style="width: 80%;">
+                            ${currentProblem.num1} (Số lớn / Tổng)
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-24 text-xs sm:text-sm font-extrabold text-rose-700 text-right shrink-0">${currentProblem.targetLabel}:</div>
+                        <div class="flex-1 flex items-center gap-1" style="width: 80%;">
+                            <div class="h-8 bg-emerald-500 text-white rounded-l-xl px-3 flex items-center justify-center font-title font-extrabold text-sm" style="width: 48%;">
+                                ? (Cần tìm)
+                            </div>
+                            <div class="h-8 bg-rose-400 text-white rounded-r-xl px-3 flex items-center justify-center font-title font-extrabold text-sm opacity-85" style="width: 32%;">
+                                Bớt ${currentProblem.num2}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function checkStep2(chosenOp) {
+            if (currentStep !== 2) return;
+
+            if (chosenOp === currentProblem.operation) {
+                playSound('correct');
+                currentStep = 3;
+                updateStepIndicators();
+
+                showFeedback('success', `👏 Chuẩn luôn! Chúng ta dùng phép tính (${chosenOp === '+' ? 'Cộng +' : 'Trừ −'}). Bây giờ tính kết quả cuối cùng nhé!`);
+
+                document.getElementById('workspace-step-2').classList.add('hidden');
+                renderStep3Workspace();
+                document.getElementById('workspace-step-3').classList.remove('hidden');
+            } else {
+                playSound('wrong');
+                showFeedback('error', `🤔 Chưa đúng phép tính rồi! Con đọc kỹ gợi ý nhé: ${currentProblem.opClue}`);
+            }
+        }
+
+        /* ==========================================================
+           7. STEP 3: CALCULATE FINAL EQUATION & VICTORY
+           ========================================================== */
+        function renderStep3Workspace() {
+            step3Input = "";
+            document.getElementById('eq-num1').textContent = currentProblem.num1;
+            document.getElementById('eq-op').textContent = currentProblem.operation === '+' ? '+' : '−';
+            document.getElementById('eq-num2').textContent = currentProblem.num2;
+            document.getElementById('eq-answer-box').textContent = "?";
+            document.getElementById('eq-unit').textContent = `(${currentProblem.unit})`;
+        }
+
+        function pressNumpad(key) {
+            if (currentStep !== 3) return;
+            playSound('click');
+
+            if (key === 'clear') {
+                step3Input = step3Input.slice(0, -1);
+            } else {
+                if (step3Input.length < 3) {
+                    step3Input += key;
+                }
+            }
+            document.getElementById('eq-answer-box').textContent = step3Input.length > 0 ? step3Input : "?";
+        }
+
+        function submitStep3() {
+            if (currentStep !== 3) return;
+            const userVal = parseInt(step3Input, 10);
+            if (isNaN(userVal)) {
+                showFeedback('error', 'Con hãy bấm số đáp án trên bàn phím trước khi bấm Chốt nhé!');
+                return;
+            }
+
+            if (userVal === currentProblem.finalAnswer) {
+                playSound('fanfare');
+                launchConfetti();
+                currentStep = 4;
+                updateStepIndicators();
+                hideFeedback();
+
+                // Award stars
+                totalStars += 3;
+                if (!currentProblem.isRandom && !solvedCaseIds.includes(currentProblem.id)) {
+                    solvedCaseIds.push(currentProblem.id);
+                }
+                saveProgress();
+                renderCasePills();
+
+                // Populate Notebook Solution Card
+                const capPhrase = currentProblem.trickyPhrase.charAt(0).toUpperCase() + currentProblem.trickyPhrase.slice(1);
+                document.getElementById('solution-line-1').innerHTML = `• ${capPhrase} là: <b>${currentProblem.decodedNum}</b>`;
+                document.getElementById('solution-line-2').innerHTML = `• ${currentProblem.solutionStatement}`;
+                document.getElementById('solution-line-3').innerHTML = `${currentProblem.num1} ${currentProblem.operation === '+' ? '+' : '−'} ${currentProblem.num2} = ${currentProblem.finalAnswer} (${currentProblem.unit})`;
+                document.getElementById('solution-line-4').innerHTML = `Đáp số: ${currentProblem.finalAnswer} ${currentProblem.unit}.`;
+
+                document.getElementById('workspace-step-3').classList.add('hidden');
+                document.getElementById('workspace-victory').classList.remove('hidden');
+            } else {
+                playSound('wrong');
+                const box = document.getElementById('eq-answer-box');
+                box.classList.add('shake', 'border-rose-500', 'bg-rose-50');
+                setTimeout(() => box.classList.remove('shake', 'border-rose-500', 'bg-rose-50'), 500);
+                showFeedback('error', `Chưa chính xác! Con tính cẩn thận lại phép tính: ${currentProblem.num1} ${currentProblem.operation === '+' ? '+' : '−'} ${currentProblem.num2} bằng bao nhiêu nhé!`);
+                step3Input = "";
+                box.textContent = "?";
+            }
+        }
+
+        function nextCase() {
+            playSound('click');
+            const nextIdx = (currentCaseIndex + 1) % curatedProblems.length;
+            selectCase(nextIdx);
+        }
+
+        /* ==========================================================
+           8. INFINITE RANDOM PROBLEM GENERATOR
+           ========================================================== */
+        function generateRandomCase() {
+            playSound('click');
+            const names = [
+                ["Hùng", "Lan"], ["Minh", "An"], ["Mai", "Đào"], ["Bình", "Nam"], ["Linh", "Chi"]
+            ];
+            const items = [
+                { name: "nhãn vở", unit: "nhãn vở" },
+                { name: "quả táo", unit: "quả táo" },
+                { name: "viên bi", unit: "viên bi" },
+                { name: "quyển truyện", unit: "quyển truyện" },
+                { name: "bông hoa", unit: "bông hoa" }
+            ];
+
+            const [nameA, nameB] = names[Math.floor(Math.random() * names.length)];
+            const item = items[Math.floor(Math.random() * items.length)];
+
+            // Pick a tricky phrase template
+            const phraseTypes = ['tron_chuc_truoc', 'tron_chuc_sau', 'lien_truoc', 'lien_sau'];
+            const pType = phraseTypes[Math.floor(Math.random() * phraseTypes.length)];
+
+            let anchorNum, decodedNum, trickyPhrase, tag, hint, options;
+
+            if (pType === 'tron_chuc_truoc') {
+                const tens = [20, 30, 40, 50][Math.floor(Math.random() * 4)];
+                const ones = Math.floor(Math.random() * 8) + 2; // 2..9
+                anchorNum = tens + ones;
+                decodedNum = tens;
+                trickyPhrase = `số tròn chục liền trước của ${anchorNum}`;
+                tag = "Số tròn chục liền trước";
+                hint = `Nhìn về bên <b>TRÁI</b> số ${anchorNum} trên tia số, tìm số tròn chục (đuôi 0) gần nhất chính là <b>${decodedNum}</b>!`;
+                options = [decodedNum - 10, decodedNum, anchorNum - 1, decodedNum + 10];
+            } else if (pType === 'tron_chuc_sau') {
+                const tens = [20, 30, 40, 50][Math.floor(Math.random() * 4)];
+                const ones = Math.floor(Math.random() * 8) + 1; // 1..8
+                anchorNum = tens + ones;
+                decodedNum = tens + 10;
+                trickyPhrase = `số tròn chục liền sau của ${anchorNum}`;
+                tag = "Số tròn chục liền sau";
+                hint = `Nhìn về bên <b>PHẢI</b> số ${anchorNum} trên tia số, tìm số tròn chục (đuôi 0) gần nhất chính là <b>${decodedNum}</b>!`;
+                options = [tens, anchorNum + 1, decodedNum, decodedNum + 10];
+            } else if (pType === 'lien_truoc') {
+                anchorNum = Math.floor(Math.random() * 15) + 6;
+                decodedNum = anchorNum - 1;
+                trickyPhrase = `số liền trước của ${anchorNum}`;
+                tag = "Số liền trước";
+                hint = `Số liền trước của ${anchorNum} đứng ngay sát bên <b>TRÁI</b> số ${anchorNum} (lấy ${anchorNum} − 1 = ${decodedNum}).`;
+                options = [decodedNum - 1, decodedNum, anchorNum, anchorNum + 1];
+            } else {
+                anchorNum = Math.floor(Math.random() * 15) + 5;
+                decodedNum = anchorNum + 1;
+                trickyPhrase = `số liền sau của ${anchorNum}`;
+                tag = "Số liền sau";
+                hint = `Số liền sau của ${anchorNum} đứng ngay sát bên <b>PHẢI</b> số ${anchorNum} (lấy ${anchorNum} + 1 = ${decodedNum}).`;
+                options = [anchorNum - 1, anchorNum, decodedNum, decodedNum + 1];
+            }
+
+            // Pick a story pattern (1 = Cộng thêm, 2 = Biết tổng tìm 1 phần, 3 = Ít hơn)
+            const storyPattern = Math.floor(Math.random() * 3) + 1;
+            let problemObj;
+
+            if (storyPattern === 1) {
+                const numA = Math.floor(Math.random() * 20) + 12;
+                problemObj = {
+                    id: 999,
+                    isRandom: true,
+                    title: "Vụ Án Ngẫu Nhiên 🎲",
+                    tag: tag,
+                    storyBefore: `${nameA} có <b class='text-blue-700'>${numA}</b> ${item.name}, ${nameB} có số ${item.name} bằng của ${nameA} <span class='underline decoration-emerald-500 decoration-2'>cộng thêm</span> `,
+                    trickyPhrase: trickyPhrase,
+                    storyAfter: `. Hỏi ${nameB} có bao nhiêu ${item.name}?`,
+                    phraseType: pType,
+                    anchorNum: anchorNum,
+                    decodedNum: decodedNum,
+                    step1Options: options,
+                    step1Hint: hint,
+                    knownNum: numA,
+                    knownLabel: `${nameA} có`,
+                    decodedLabel: "Cộng thêm",
+                    targetLabel: `${nameB} có`,
+                    operation: "+",
+                    opClue: `${nameB} có bằng của ${nameA} <b>'cộng thêm'</b> ${decodedNum}, nên ta chọn <b>Phép Cộng (+)</b>.`,
+                    num1: numA,
+                    num2: decodedNum,
+                    finalAnswer: numA + decodedNum,
+                    unit: item.unit,
+                    solutionStatement: `Số ${item.name} ${nameB} có là:`
+                };
+            } else if (storyPattern === 2) {
+                const total = decodedNum + Math.floor(Math.random() * 25) + 12;
+                problemObj = {
+                    id: 999,
+                    isRandom: true,
+                    title: "Vụ Án Ngẫu Nhiên 🎲",
+                    tag: tag,
+                    storyBefore: `${nameA} và ${nameB} có <span class='underline decoration-rose-500 decoration-2'>tổng</span> <b class='text-blue-700'>${total}</b> ${item.name}. Biết rằng ${nameB} có số ${item.name} là `,
+                    trickyPhrase: trickyPhrase,
+                    storyAfter: `. Hỏi ${nameA} có bao nhiêu ${item.name}?`,
+                    phraseType: pType,
+                    anchorNum: anchorNum,
+                    decodedNum: decodedNum,
+                    step1Options: options,
+                    step1Hint: hint,
+                    knownNum: total,
+                    knownLabel: "Tổng 2 bạn",
+                    decodedLabel: `${nameB} có`,
+                    targetLabel: `${nameA} có`,
+                    operation: "-",
+                    opClue: `Biết <b>tổng của hai bạn là ${total}</b>, trong đó ${nameB} có ${decodedNum}. Muốn tìm của ${nameA}, ta lấy Tổng <b>trừ đi (−)</b>!`,
+                    num1: total,
+                    num2: decodedNum,
+                    finalAnswer: total - decodedNum,
+                    unit: item.unit,
+                    solutionStatement: `Số ${item.name} ${nameA} có là:`
+                };
+            } else {
+                const diff = Math.max(5, Math.min(decodedNum - 5, Math.floor(Math.random() * 18) + 6));
+                problemObj = {
+                    id: 999,
+                    isRandom: true,
+                    title: "Vụ Án Ngẫu Nhiên 🎲",
+                    tag: tag,
+                    storyBefore: `${nameA} có số ${item.name} là `,
+                    trickyPhrase: trickyPhrase,
+                    storyAfter: `. ${nameB} có số ${item.name} <span class='underline decoration-rose-500 decoration-2'>ít hơn</span> ${nameA} <b class='text-blue-700'>${diff}</b> ${item.name}. Hỏi ${nameB} có bao nhiêu ${item.name}?`,
+                    phraseType: pType,
+                    anchorNum: anchorNum,
+                    decodedNum: decodedNum,
+                    step1Options: options,
+                    step1Hint: hint,
+                    knownNum: diff,
+                    knownLabel: `${nameA} có`,
+                    decodedLabel: "Ít hơn",
+                    targetLabel: `${nameB} có`,
+                    operation: "-",
+                    opClue: `${nameB} có <b>'ít hơn'</b> ${nameA} ${diff} ${item.name}, nên ta chọn <b>Phép Trừ (−)</b>.`,
+                    num1: decodedNum,
+                    num2: diff,
+                    finalAnswer: decodedNum - diff,
+                    unit: item.unit,
+                    solutionStatement: `Số ${item.name} ${nameB} có là:`
+                };
+            }
+
+            currentProblem = problemObj;
+            initProblemState();
+        }
+
+        /* ==========================================================
+           9. MODE 2: SPEED DRILL MINI-GAME
+           ========================================================== */
+        let currentDrill = null;
+        let drillStreak = 0;
+
+        function generateDrillQuestion() {
+            const types = ['tron_chuc_truoc', 'tron_chuc_sau', 'lien_truoc', 'lien_sau', 'special'];
+            const pick = types[Math.floor(Math.random() * types.length)];
+
+            let qText, hint, anchor, answer, opts, pType;
+
+            if (pick === 'tron_chuc_truoc') {
+                const tens = [10, 20, 30, 40, 50, 60, 70, 80][Math.floor(Math.random() * 8)];
+                const ones = Math.floor(Math.random() * 8) + 2;
+                anchor = tens + ones;
+                answer = tens;
+                pType = 'tron_chuc_truoc';
+                qText = `Số tròn chục liền trước của ${anchor}`;
+                hint = `💡 Nhìn về bên TRÁI số ${anchor}, tìm số có đuôi bằng 0 gần nhất!`;
+                opts = [Math.max(0, tens - 10), tens, anchor - 1, tens + 10];
+            } else if (pick === 'tron_chuc_sau') {
+                const tens = [10, 20, 30, 40, 50, 60, 70, 80][Math.floor(Math.random() * 8)];
+                const ones = Math.floor(Math.random() * 8) + 1;
+                anchor = tens + ones;
+                answer = tens + 10;
+                pType = 'tron_chuc_sau';
+                qText = `Số tròn chục liền sau của ${anchor}`;
+                hint = `💡 Nhìn về bên PHẢI số ${anchor}, tìm số có đuôi bằng 0 gần nhất!`;
+                opts = [tens, anchor + 1, tens + 10, Math.min(100, tens + 20)];
+            } else if (pick === 'lien_truoc') {
+                anchor = Math.floor(Math.random() * 70) + 10;
+                answer = anchor - 1;
+                pType = 'lien_truoc';
+                qText = `Số liền trước của ${anchor}`;
+                hint = `💡 Lùi 1 bước trên tia số (${anchor} − 1)`;
+                opts = [Math.floor(anchor / 10) * 10, anchor - 1, anchor + 1, anchor + 10];
+            } else if (pick === 'lien_sau') {
+                anchor = Math.floor(Math.random() * 70) + 10;
+                answer = anchor + 1;
+                pType = 'lien_sau';
+                qText = `Số liền sau của ${anchor}`;
+                hint = `💡 Tiến 1 bước trên tia số (${anchor} + 1)`;
+                opts = [anchor - 1, anchor + 1, (Math.floor(anchor / 10) + 1) * 10, anchor + 2];
+            } else {
+                const specials = [
+                    { q: "Số lớn nhất có 1 chữ số", a: 9, o: [1, 8, 9, 10], h: "💡 Các số có 1 chữ số là từ 0 đến 9", t: 'special_max1' },
+                    { q: "Số nhỏ nhất có 2 chữ số", a: 10, o: [9, 10, 11, 20], h: "💡 Số bắt đầu có 2 chữ số đầu tiên là 10", t: 'special_max1' },
+                    { q: "Số nhỏ nhất có 2 chữ số giống nhau", a: 11, o: [10, 11, 22, 99], h: "💡 Hai chữ số giống nhau nhỏ nhất là 11", t: 'special_same2' },
+                    { q: "Số tròn chục lớn nhất có 2 chữ số", a: 90, o: [80, 90, 99, 100], h: "💡 Vừa có 2 chữ số, vừa có đuôi bằng 0 lớn nhất là 90", t: 'special_max_ten' }
+                ];
+                const sp = specials[Math.floor(Math.random() * specials.length)];
+                anchor = sp.a;
+                answer = sp.a;
+                pType = sp.t;
+                qText = sp.q;
+                hint = sp.h;
+                opts = sp.o;
+            }
+
+            // Ensure unique 4 options
+            const uniqueSet = new Set(opts);
+            while (uniqueSet.size < 4) {
+                uniqueSet.add(answer + uniqueSet.size + 2);
+            }
+            const finalOpts = Array.from(uniqueSet).sort((a, b) => a - b);
+
+            currentDrill = {
+                qText,
+                hint,
+                anchorNum: anchor,
+                decodedNum: answer,
+                phraseType: pType,
+                options: finalOpts
+            };
+
+            document.getElementById('drill-question-text').textContent = `"${qText}"`;
+            document.getElementById('drill-rule-hint').textContent = hint;
+            document.getElementById('drill-feedback').classList.add('hidden');
+
+            renderInteractiveNumberLine(
+                document.getElementById('drill-numberline'),
+                currentDrill,
+                (num) => checkDrillAnswer(num)
+            );
+
+            const optContainer = document.getElementById('drill-options');
+            optContainer.innerHTML = '';
+            finalOpts.forEach(val => {
+                const btn = document.createElement('button');
+                btn.onclick = () => checkDrillAnswer(val, btn);
+                btn.className = "btn-3d btn-white py-4 rounded-2xl font-title font-extrabold text-2xl sm:text-3xl text-purple-900 hover:bg-purple-100";
+                btn.textContent = val;
+                optContainer.appendChild(btn);
+            });
+        }
+
+        function checkDrillAnswer(val, btnEl) {
+            const fb = document.getElementById('drill-feedback');
+            fb.classList.remove('hidden');
+
+            if (val === currentDrill.decodedNum) {
+                playSound('correct');
+                drillStreak++;
+                totalStars += 1;
+                saveProgress();
+                document.getElementById('drill-streak').textContent = drillStreak;
+                fb.className = "mt-4 rounded-2xl p-3 font-bold text-center text-sm sm:text-base bg-emerald-100 text-emerald-900 border-2 border-emerald-400";
+                fb.innerHTML = `🎉 Siêu quá! Đáp án đúng là <b>${val}</b> (+1 ⭐). Đang chuyển câu tiếp theo...`;
+                setTimeout(() => generateDrillQuestion(), 1100);
+            } else {
+                playSound('wrong');
+                drillStreak = 0;
+                document.getElementById('drill-streak').textContent = 0;
+                if (btnEl) {
+                    btnEl.classList.add('shake', 'bg-rose-100');
+                    setTimeout(() => btnEl.classList.remove('shake', 'bg-rose-100'), 450);
+                }
+                fb.className = "mt-4 rounded-2xl p-3 font-bold text-center text-sm sm:text-base bg-rose-100 text-rose-900 border-2 border-rose-400";
+                fb.innerHTML = `🤔 Chưa đúng rồi! Con nhìn tia số bên trên để tìm lại nhé!`;
+            }
+        }
+
+        function speakDrillQuestion() {
+            if (currentDrill) {
+                speakVietnamese(`Hãy tìm: ${currentDrill.qText}`);
+            }
+        }
+
+        /* ==========================================================
+           10. UI HELPERS, TABS, TTS & CONFETTI
+           ========================================================== */
+        function switchMode(mode) {
+            playSound('click');
+            currentMode = mode;
+
+            const modes = ['story', 'drill', 'dictionary'];
+            modes.forEach(m => {
+                const sec = document.getElementById(`mode-${m}`);
+                const tab = document.getElementById(`tab-${m}`);
+                if (m === mode) {
+                    sec.classList.remove('hidden');
+                    tab.className = "flex-1 min-w-[140px] py-2 px-3 rounded-2xl font-title font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all bg-amber-500 text-white shadow-md border-2 border-amber-600";
+                } else {
+                    sec.classList.add('hidden');
+                    tab.className = "flex-1 min-w-[140px] py-2 px-3 rounded-2xl font-title font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all bg-white text-slate-600 hover:bg-amber-50 border-2 border-slate-200";
+                }
+            });
+
+            if (mode === 'drill' && !currentDrill) {
+                generateDrillQuestion();
+            }
+        }
+
+        function showFeedback(type, htmlMsg) {
+            const banner = document.getElementById('feedback-banner');
+            banner.classList.remove('hidden');
+            if (type === 'success') {
+                banner.className = "mt-4 rounded-2xl p-3.5 font-bold text-sm sm:text-base flex items-center justify-center gap-2 text-center bg-emerald-100 text-emerald-900 border-2 border-emerald-400";
+            } else {
+                banner.className = "mt-4 rounded-2xl p-3.5 font-bold text-sm sm:text-base flex items-center justify-center gap-2 text-center bg-rose-100 text-rose-900 border-2 border-rose-400 shake";
+            }
+            banner.innerHTML = htmlMsg;
+        }
+
+        function hideFeedback() {
+            const banner = document.getElementById('feedback-banner');
+            banner.classList.add('hidden');
+        }
+
+        function speakCurrentProblem() {
+            const stripHtml = (html) => {
+                const tmp = document.createElement('DIV');
+                tmp.innerHTML = html;
+                return tmp.textContent || tmp.innerText || '';
+            };
+            const middle = isPhraseDecoded ? String(currentProblem.decodedNum) : currentProblem.trickyPhrase;
+            const fullText = `${stripHtml(currentProblem.storyBefore)} ${middle} ${stripHtml(currentProblem.storyAfter)}`;
+            speakVietnamese(fullText);
+        }
+
+        // Confetti Celebration Effect
+        function launchConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const pieces = [];
+            const colors = ['#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#FBBF24'];
+
+            for (let i = 0; i < 85; i++) {
+                pieces.push({
+                    x: canvas.width / 2 + (Math.random() - 0.5) * 200,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: -Math.random() * 14 - 4,
+                    size: Math.random() * 8 + 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rot: Math.random() * 360,
+                    vRot: (Math.random() - 0.5) * 12
+                });
+            }
+
+            let frame = 0;
+            function animate() {
+                frame++;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                pieces.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.35; // gravity
+                    p.rot += p.vRot;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rot * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+
+                if (frame < 95) {
+                    requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            animate();
+        }
+
+        // Initialize on Window Load
+        window.onload = function () {
+            updateHeaderStats();
+            selectCase(0);
+        };
+    </script>
+</body>
+</html>
